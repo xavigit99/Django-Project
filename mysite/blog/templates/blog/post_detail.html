@@ -1,25 +1,25 @@
 <h2>{{ post.title }}</h2>
 <p>{{ post.content }}</p>
 
-<h3>Comentários</h3>
+<h3>Comments</h3>
 <ul>
     {% for comment in post.comments.all %}
         <li>{{ comment.author.username }}: {{ comment.content }} ({{ comment.created_at }})</li>
     {% empty %}
-        <li>Nenhum comentário ainda.</li>
+        <li>No Comments yet</li>
     {% endfor %}
 </ul>
 
-<h3>Adicionar um Comentário</h3>
+<h3>Add Comment</h3>
 <form method="POST">
     {% csrf_token %}
     <textarea name="content" required></textarea>
-    <button type="submit">Enviar Comentário</button>
+    <button type="submit">Send Comment</button>
 </form>
 
 <h3>Avaliar este Post</h3>
 <form method="POST" action="{% url 'rate_post' post.id %}">
     {% csrf_token %}
-    <button type="submit" name="value" value="1">Bom</button>
-    <button type="submit" name="value" value="-1">Mau</button>
+    <button type="submit" name="value" value="1">Good</button>
+    <button type="submit" name="value" value="-1">Bad</button>
 </form>

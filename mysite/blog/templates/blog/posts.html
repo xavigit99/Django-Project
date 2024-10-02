@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +31,9 @@
             background-color: rgba(0, 0, 0, 0.8);
             padding: 10px 20px;
             color: white;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
         }
         .header .left {
             font-size: 24px;
@@ -90,7 +93,24 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            padding-top: 10px;
+            padding-top: 70px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-bar input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s; 
+        }
+        .search-bar input[type="text"]:focus {
+            border-color: #0056b3; 
+            outline: none; 
         }
         .posts {
             display: flex;
@@ -114,17 +134,6 @@
             border-radius: 10px;
             margin-bottom: 10px;
         }
-        .post-actions {
-            margin-top: 10px;
-        }
-        .post-actions .button {
-            margin-right: 5px;
-        }
-        .feedback {
-            color: green;
-            margin: 20px 0;
-            font-weight: bold;
-        }
         .comments {
             margin-top: 15px;
             border-top: 1px solid #ddd;
@@ -142,15 +151,12 @@
         .comment-form {
             margin-top: 15px;
         }
-        .rating {
-            margin: 10px 0;
-        }
         textarea {
             width: 100%;
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px;
-            resize: vertical;
+            padding: 5px;
+            resize: None;
         }
         @media (max-width: 768px) {
             .sidebar {
@@ -184,13 +190,17 @@
     <div class="sidebar">
         <a href="{% url 'new-post' %}">Create Your Post</a>
         <a href="{% url 'posts' %}">Posts</a>
-        <a href="favourite-posts">Favourite Posts</a>
-        <a href="#about-us">About Us</a>
-        <a href="#feedBack">Feedback</a>
+        <a href="{% url 'about-us' %}">About Us</a>
+        <a href="{% url 'feedback' %}">Feedback</a>
     </div>
     <div class="content">
         <h1 style="text-align: center; margin-bottom: 20px;">Posts</h1> 
         
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search by title..." onkeyup="filterPosts()">
+        </div>
+
         {% if messages %}
             <div class="feedback">
                 {% for message in messages %}
@@ -199,54 +209,64 @@
             </div>
         {% endif %}
 
-        <div class="posts">
-            {% for post in posts %}
-                <div class="post">
-                    <h3>{{ post.title }}</h3>
-                    {% if post.image %}
-                        <img src="{{ post.image.url }}" alt="Image for {{ post.title }}">
-                    {% endif %}
-                    <p>{{ post.content }}</p>
-                    <div class="rating">
-                        <strong>Rating:</strong> {{ post.rating }} 
-                    </div>
-                    <div class="post-actions">
-                        {% if user.is_authenticated %}
-                            {% if user == post.author or user.is_superuser %}
-                                <a href="{% url 'edit_post' post.id %}" class="button">Edit</a>
-                                <form action="{% url 'delete_post' post.id %}" method="post" style="display:inline;">
+        <div class="posts" id="posts-container">
+            {% if posts %}
+                {% for post in posts %}
+                    <div class="post" data-title="{{ post.title|lower }}">
+                        <h3>{{ post.title }}</h3>
+                        <p><strong>Author:</strong> {{ post.author.username }}</p>
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="Image for {{ post.title }}">
+                        {% endif %}
+                        <p>{{ post.content }}</p>
+                        <div class="post-actions" style="display: flex; justify-content: flex-end;">
+                            {% if user.is_authenticated %}
+                                {% if user == post.author or user.is_superuser %}
+                                    <a href="{% url 'edit_post' post.id %}" class="button">Edit</a>
+                                    <form action="{% url 'delete_post' post.id %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="button" style="background-color: #dc3545;">Delete</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <div class="comments">
+                            <h4>Comments:</h4>
+                            {% for comment in post.comments.all %}
+                                <div class="comment">
+                                    <p><strong>{{ comment.author.username }}:</strong> {{ comment.content }}</p>
+                                </div>
+                            {% endfor %}
+                            {% if user.is_authenticated %}
+                                <form action="{% url 'add_comment' post.id %}" method="post" class="comment-form">
                                     {% csrf_token %}
-                                    <button type="submit" class="button" style="background-color: #dc3545;">Delete</button>
+                                    <textarea name="content" rows="3" required placeholder="Add a comment..."></textarea><br>
+                                    <button type="submit" class="button">Submit Comment</button>
                                 </form>
                             {% endif %}
-                        {% endif %}
-                    </div>
-
-                    <div class="comments">
-                        <h4>Comments:</h4>
-                        {% for comment in post.comments.all %}
-                            <div class="comment">
-                                <p><strong>{{ comment.author.username }}:</strong> {{ comment.content }}</p>
-                            </div>
-                        {% empty %}
-                            <p>No comments yet.</p>
-                        {% endfor %}
-                    </div>
-
-                    {% if user.is_authenticated %}
-                        <div class="comment-form">
-                            <form action="{% url 'add_comment' post.id %}" method="post">
-                                {% csrf_token %}
-                                <textarea name="content" rows="3" placeholder="Add a comment..." required></textarea><br>
-                                <button type="submit" class="button">Submit</button>
-                            </form>
                         </div>
-                    {% else %}
-                        <p><em>Please log in to comment.</em></p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No posts found.</p>
+            {% endif %}
         </div>
     </div>
+
+    <script>
+        function filterPosts() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const posts = document.querySelectorAll('.post');
+            posts.forEach(post => {
+                const title = post.getAttribute('data-title');
+                if (title.includes(input)) {
+                    post.style.display = '';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>United For Food</title>
+    <title>About Us - United For Food</title>
     <style>
         body {
             margin: 0;
@@ -32,8 +33,8 @@
             padding: 10px 20px;
             color: white;
             position: fixed;
-            top: 0;
             width: 100%;
+            top: 0;
             z-index: 1000;
         }
         .header .left {
@@ -58,7 +59,7 @@
             cursor: pointer;
             font-size: 16px;
             border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s; 
+            transition: background-color 0.3s, transform 0.2s;
             display: inline-block;
             text-align: center;
         }
@@ -95,7 +96,7 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            padding-top: 10px;
+            padding-top: 75px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -104,14 +105,28 @@
             text-align: center;
             color: white;
         }
-        .welcome-text {
-            font-size: 60px;
+        .about-title {
+            font-size: 36px;
             font-weight: bold;
             margin: 20px 0; 
             font-family: 'Georgia', serif;
         }
+        .about-text {
+            font-size: 20px;
+            margin: 20px 0;
+            line-height: 1.5;
+            max-width: 800px;
+        }
+        .about-image {
+            width: 300px;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
         .logo {
-            width: 600px;
+            width: 300px;
             height: auto;
             margin-bottom: 20px; 
         }
@@ -129,7 +144,6 @@
     </style>
 </head>
 <body>
-    {% load static %}
     <div class="header">
         <div class="left">
             <a href="{% url 'home' %}" style="color: white; text-decoration: none;">United For Food</a>
@@ -151,8 +165,15 @@
         <a href="{% url 'feedback' %}">Feedback</a>
     </div>
     <div class="content">
+        <div class="about-title">About Us</div>
+        <div class="about-text">
+            Welcome to United For Food, a blog dedicated to celebrating the art of home-cooked meals. Our mission is to bring together food enthusiasts and home chefs from around the world to share their culinary creations. 
+            <br><br>
+            Here, you will find tons of delicious recipes, tips, and inspiration from everyday cooks who pour their hearts into each dish. Whether you're looking for comfort food, healthy options, or extravagant dishes, we have something for everyone.
+            <br><br>
+            Join us on this flavorful journey, where every meal tells a story, and every recipe is a chance to create lasting memories.
+        </div>
         <img src="{% static 'images/unitedfood.png' %}" alt="Logo" class="logo">
-        <div class="welcome-text">Welcome To United For Food</div>
     </div>
 </body>
 </html>

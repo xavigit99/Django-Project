@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excluir Post</title>
+    <title>Exclude Post</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'blog/styles.css' %}">
 </head>
 <body>
-    <h1>Excluir Post</h1>
+    <h1>Delete Post</h1>
     <div class="form-container">
-        <p>Você tem certeza que deseja excluir o post "{{ post.title }}"?</p>
+        <p>You really want to delete : "{{ post.title }}"?</p>
         <form method="post">
             {% csrf_token %}
-            <button type="submit">Excluir Post</button>
+            <button type="submit">Exclude Post</button>
         </form>
-        <a href="{% url 'posts' %}">Voltar para os posts</a>
+        <a href="{% url 'posts' %}">Go Back To Posts</a>
     </div>
 </body>
 </html>

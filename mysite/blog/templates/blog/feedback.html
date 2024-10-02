@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>United For Food</title>
+    <title>United For Food - Feedback</title>
     <style>
         body {
             margin: 0;
@@ -95,7 +95,6 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            padding-top: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -104,32 +103,45 @@
             text-align: center;
             color: white;
         }
-        .welcome-text {
-            font-size: 60px;
-            font-weight: bold;
-            margin: 20px 0; 
-            font-family: 'Georgia', serif;
+        .feedback-form {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
         }
-        .logo {
-            width: 600px;
-            height: auto;
-            margin-bottom: 20px; 
+        .feedback-form input[type="email"],
+        .feedback-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
         }
-        @media (max-width: 768px) {
-            .sidebar {
-                position: relative;
-                height: auto;
-                width: 100%;
-            }
-            .content {
-                margin-left: 0;
-                padding: 10px;
-            }
+        .feedback-form input[type="file"] {
+            margin: 10px 0;
+            color: white;
+            display: block;
+            width: auto;
+        }
+        .feedback-form button {
+            width: 100%;
+        }
+        .success-message {
+            color: #00ff00;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        .feedback-sent {
+            color: #00ff00;
+            margin-top: 10px;
+            font-size: 18px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    {% load static %}
     <div class="header">
         <div class="left">
             <a href="{% url 'home' %}" style="color: white; text-decoration: none;">United For Food</a>
@@ -151,8 +163,28 @@
         <a href="{% url 'feedback' %}">Feedback</a>
     </div>
     <div class="content">
-        <img src="{% static 'images/unitedfood.png' %}" alt="Logo" class="logo">
-        <div class="welcome-text">Welcome To United For Food</div>
+        <div class="feedback-form">
+            <h2>Send Your Feedback</h2>
+            <form method="POST" enctype="multipart/form-data" onsubmit="showFeedbackSent(event)">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" rows="4" placeholder="Write your feedback..." required></textarea>
+                <input type="file" name="image">
+                <button type="submit" class="button">Submit</button>
+            </form>
+            <p class="feedback-sent">Feedback Sent!</p>
+            {% if success %}
+            <p class="success-message">Sent successfully!</p>
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+        function showFeedbackSent(event) {
+            event.preventDefault(); 
+            document.querySelector('.feedback-sent').style.display = 'block';
+            document.querySelector('.feedback-form').reset();
+        }
+    </script>
 </body>
 </html>

@@ -3,8 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import PostForm
-from .models import Post, Comment, FavouritePost
+from .forms import PostForm, FeedbackForm
+from .models import Post, Comment, FavouritePost, Rating
+from django.views.generic import TemplateView
 
 def home(request):
     return render(request, 'blog/home.html')
@@ -38,12 +39,12 @@ def login_view(request):
     
     return render(request, 'blog/login.html')
 
-@login_required
+@login_required(login_url='login')
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-@login_required
+@login_required(login_url='login')
 def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -76,7 +77,7 @@ def edit_post(request, post_id):
 
     return render(request, 'blog/edit_post.html', {'form': form})
 
-@login_required
+@login_required(login_url='login')
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author and not request.user.is_superuser:
@@ -85,7 +86,7 @@ def delete_post(request, post_id):
     
     if request.method == 'POST':
         post.delete()
-        messages.success(request, "Post excluído com sucesso!")
+        messages.success(request)
         return redirect('posts')
 
     return render(request, 'blog/delete_post.html', {'post': post})
@@ -94,7 +95,7 @@ def posts(request):
     all_posts = Post.objects.all()
     return render(request, 'blog/posts.html', {'posts': all_posts})
 
-@login_required
+@login_required(login_url='login')
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.all()
@@ -109,7 +110,6 @@ def post_detail(request, post_id):
         elif 'rating' in request.POST:
             rating = request.POST['rating']
             if rating == 'positive':
-                FavoritePost.objects.get_or_create(user=request.user, post=post)
                 messages.success(request, "Post adicionado aos Favoritos!")
                 return redirect('favourite-posts')
 
@@ -118,12 +118,12 @@ def post_detail(request, post_id):
         'comments': comments,
     })
 
-@login_required
+@login_required(login_url='login')
 def favourite_posts(request):
     favourite_posts = FavouritePost.objects.filter(user=request.user).select_related('post')
     return render(request, 'blog/favourite_posts.html', {'favorite_posts': favourite_posts})
 
-@login_required
+@login_required(login_url='login')
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
@@ -135,7 +135,7 @@ def add_comment(request, post_id):
             messages.error(request, 'Comment content cannot be empty.')
     return redirect('posts')
 
-@login_required
+@login_required(login_url='login')
 def rate_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
@@ -147,3 +147,23 @@ def rate_post(request, post_id):
         )
         messages.success(request, "Avaliação adicionada com sucesso!")
         return redirect('post_detail', post_id=post.id)
+
+class AboutUsView(TemplateView):
+    template_name = 'blog/about_us.html'
+
+@login_required(login_url='login')
+def search_posts(request):
+    query = request.GET.get('query')
+    posts = Post.objects.filter(title__icontains=query) 
+    return render(request, 'blog/posts.html', {'posts': posts, 'query': query})
+
+@login_required(login_url='login')
+def feedback_view(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return render(request, 'feedback.html', {'form': FeedbackForm(), 'success': True})
+    else:
+        form = FeedbackForm()
+    return render(request, 'blog/feedback.html', {'form': form})

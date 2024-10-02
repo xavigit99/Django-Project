@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts Favoritos</title>
+    <title>Favourite Posts</title>
 </head>
 <body>
-    <h1>Posts Favoritos</h1>
+    <h1>Favourite Posts</h1>
     <ul>
         {% for favorite in favorite_posts %}
             <li>
                 <a href="{% url 'post_detail' favorite.post.id %}">{{ favorite.post.title }}</a>
             </li>
         {% empty %}
-            <li>Nenhum post favorito ainda.</li>
+            <li>No Favourite Posts yet.</li>
         {% endfor %}
     </ul>
 </body>
