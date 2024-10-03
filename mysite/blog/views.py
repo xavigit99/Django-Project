@@ -2,9 +2,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm, FeedbackForm
-from .models import Post, Comment, FavouritePost, Rating
+from .models import Post, Comment
 from django.views.generic import TemplateView
 
 def home(request):
@@ -12,14 +13,22 @@ def home(request):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "O nome de usuário já está em uso.")
+        username = request.POST.get('username', '').strip()  # Use strip() para remover espaçospy
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+
+        if not username:
+            messages.error(request, "Username is mandatory")
             return redirect('register')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already in use")
+            return redirect('register')
+
         user = User.objects.create_user(username=username, email=email, password=password)
         user.save()
+        group = Group.objects.get(name='User')
+        user.groups.add(group)
         login(request, user)
         return redirect('home')
     
@@ -34,7 +43,7 @@ def login_view(request):
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, "Credenciais inválidas.")
+            messages.error(request, "Invalid Credentials.")
             return redirect('login')
     
     return render(request, 'blog/login.html')
@@ -52,7 +61,7 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            messages.success(request, "Post criado com sucesso!")
+            messages.success(request, "Success")
             return redirect('posts')
     else:
         form = PostForm()
@@ -63,14 +72,14 @@ def create_post(request):
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author and not request.user.is_superuser:
-        messages.error(request, "Você não tem permissão para editar este post.")
+        messages.error(request, "No Permission")
         return redirect('posts')
     
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
-            messages.success(request, "Post editado com sucesso!")
+            messages.success(request, "Success")
             return redirect('posts')
     else:
         form = PostForm(instance=post)
@@ -81,15 +90,16 @@ def edit_post(request, post_id):
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author and not request.user.is_superuser:
-        messages.error(request, "Você não tem permissão para excluir este post.")
+        messages.error(request, "No Permission")
         return redirect('posts')
     
     if request.method == 'POST':
         post.delete()
-        messages.success(request)
+        messages.success(request, "Success")
         return redirect('posts')
 
     return render(request, 'blog/delete_post.html', {'post': post})
+
 
 def posts(request):
     all_posts = Post.objects.all()
@@ -104,24 +114,13 @@ def post_detail(request, post_id):
         if 'comment' in request.POST:
             comment_content = request.POST['comment']
             Comment.objects.create(post=post, author=request.user, content=comment_content)
-            messages.success(request, "Comentário adicionado com sucesso!")
+            messages.success(request, "Success")
             return redirect('post_detail', post_id=post.id)
-        
-        elif 'rating' in request.POST:
-            rating = request.POST['rating']
-            if rating == 'positive':
-                messages.success(request, "Post adicionado aos Favoritos!")
-                return redirect('favourite-posts')
 
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
     })
-
-@login_required(login_url='login')
-def favourite_posts(request):
-    favourite_posts = FavouritePost.objects.filter(user=request.user).select_related('post')
-    return render(request, 'blog/favourite_posts.html', {'favorite_posts': favourite_posts})
 
 @login_required(login_url='login')
 def add_comment(request, post_id):
@@ -134,19 +133,6 @@ def add_comment(request, post_id):
         else:
             messages.error(request, 'Comment content cannot be empty.')
     return redirect('posts')
-
-@login_required(login_url='login')
-def rate_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        value = int(request.POST['value']) 
-        Rating.objects.update_or_create(
-            post=post,
-            user=request.user,
-            defaults={'value': value}
-        )
-        messages.success(request, "Avaliação adicionada com sucesso!")
-        return redirect('post_detail', post_id=post.id)
 
 class AboutUsView(TemplateView):
     template_name = 'blog/about_us.html'
@@ -167,3 +153,4 @@ def feedback_view(request):
     else:
         form = FeedbackForm()
     return render(request, 'blog/feedback.html', {'form': form})
+

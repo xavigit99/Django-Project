@@ -15,19 +15,6 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-
-class FavouritePost(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-class Rating(models.Model):
-    post = models.ForeignKey(Post, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    value = models.IntegerField()
-
-    def __str__(self):
-        return self.title
     
 class Feedback(models.Model):
     email = models.EmailField()

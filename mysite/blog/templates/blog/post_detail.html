@@ -16,10 +16,3 @@
     <textarea name="content" required></textarea>
     <button type="submit">Send Comment</button>
 </form>
-
-<h3>Avaliar este Post</h3>
-<form method="POST" action="{% url 'rate_post' post.id %}">
-    {% csrf_token %}
-    <button type="submit" name="value" value="1">Good</button>
-    <button type="submit" name="value" value="-1">Bad</button>
-</form>
