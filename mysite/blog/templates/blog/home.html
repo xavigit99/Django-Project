@@ -9,21 +9,11 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(270deg, #00aaff, #0055ff, #00aaff);
+            background: #9fdfff;
             background-size: 300% 300%;
             animation: gradient 15s ease infinite;
         }
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -58,7 +48,7 @@
             cursor: pointer;
             font-size: 16px;
             border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s; 
+            transition: background-color 0.3s, transform 0.2s;
             display: inline-block;
             text-align: center;
         }
@@ -77,8 +67,9 @@
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px; /* Diminui a separação entre os itens da barra lateral */
             overflow-y: auto;
+            z-index: 1000;
         }
         .sidebar a {
             color: white;
@@ -88,9 +79,73 @@
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
             transition: background-color 0.3s;
+            width: 100%; /* Define a largura dos links */
+            box-sizing: border-box; /* Garante que o padding não afete a largura */
         }
         .sidebar a:hover {
             background-color: rgba(255, 255, 255, 0.2);
+        }
+        /* Dropdown styling */
+        .dropdown {
+            position: relative;
+        }
+        .dropdown > a {
+            display: flex; /* Flex para alinhar o conteúdo */
+            justify-content: space-between;
+            align-items: center;
+            width: 100%; /* Define a largura do dropdown */
+            padding: 10px; /* Mantém o padding igual aos outros links */
+            background-color: rgba(255, 255, 255, 0.1); /* Fundo igual ao dos outros links */
+            border-radius: 5px; /* Bordas arredondadas */
+            transition: background-color 0.3s;
+        }
+        .dropdown > a:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Efeito hover para o link principal */
+        }
+        .dropdown .dropdown-content {
+            display: none;
+            top : 100%;
+            position: absolute;
+            right : 0;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 1001;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+            width: 100%; /* Define a largura dos links */
+            box-sizing: border-box; /* Garante que o padding não afete a largura */
+            margin-top: 2px; /* Espaçamento entre o link e o dropdown */
+        }
+        .dropdown .dropdown-content a {
+            color: white;
+            padding: 10px 16px; /* Espaçamento interno nos links do dropdown */
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            padding: 10px 16px; /* Espaçamento interno nos links do dropdown */
+            margin-bottom: 5px; /* Adiciona espaçamento entre os links do dropdown */
+        }
+        .dropdown .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Efeito hover para os links do dropdown */
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown > a::after {
+            content: "▼";
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .dropdown:hover > a::after {
+            content: "▲";
+        }
+
+        .dropdown .dropdown-content a:last-child {
+            margin-bottom: 0;
         }
         .content {
             margin-left: 250px;
@@ -107,13 +162,14 @@
         .welcome-text {
             font-size: 60px;
             font-weight: bold;
-            margin: 20px 0; 
+            margin: 20px 0;
             font-family: 'Georgia', serif;
+            text-shadow: 2px 2px 3px black;
         }
         .logo {
             width: 600px;
             height: auto;
-            margin-bottom: 20px; 
+            margin-bottom: 20px;
         }
         @media (max-width: 768px) {
             .sidebar {
@@ -136,7 +192,7 @@
         </div>
         <div class="user-info">
             {% if user.is_authenticated %}
-                User Logged: {{ user.username }} 
+                User Logged: {{ user.username }}
                 <button class="button" onclick="location.href='/logout/'">Logout</button>
             {% else %}
                 <button class="button" onclick="location.href='/login/'">Login</button>
@@ -149,6 +205,17 @@
         <a href="{% url 'posts' %}">Posts</a>
         <a href="{% url 'about-us' %}">About Us</a>
         <a href="{% url 'feedback' %}">Feedback</a>
+        
+        <!-- Dropdown Receipts -->
+        <div class="dropdown">
+            <a href="{% url 'receipts' %}">Receipts</a>
+            <div class="dropdown-content">
+                <a href="{% url 'recipe-list' category='Meat' %}">Meat Recipe</a>
+                <a href="{% url 'recipe-list' category='Fish' %}">Fish Recipe</a>
+                <a href="{% url 'recipe-list' category='Vegetarian' %}">Vegetarian Recipe</a>
+                <a href="{% url 'recipe-list' category='Healthy' %}">Healthy Recipe</a>
+            </div>
+        </div>
     </div>
     <div class="content">
         <img src="{% static 'images/unitedfood.png' %}" alt="Logo" class="logo">

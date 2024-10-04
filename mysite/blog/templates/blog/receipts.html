@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipts - United For Food</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #9fdfff;
+            background-size: 300% 300%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header .left {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-info {
+            margin-left: auto;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            padding-right: 30px;
+        }
+
+        .user-info button {
+            margin-left: 10px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 55px;
+            width: 250px;
+            height: calc(100% - 55px);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Diminui a separação entre os itens da barra lateral */
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            width: 100%; /* Define a largura dos links */
+            box-sizing: border-box; /* Garante que o padding não afete a largura */
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Dropdown styling */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown > a {
+            display: flex; /* Flex para alinhar o conteúdo */
+            justify-content: space-between;
+            align-items: center;
+            width: 100%; /* Define a largura do dropdown */
+            padding: 10px; /* Mantém o padding igual aos outros links */
+            background-color: rgba(255, 255, 255, 0.1); /* Fundo igual ao dos outros links */
+            border-radius: 5px; /* Bordas arredondadas */
+            transition: background-color 0.3s;
+        }
+
+        .dropdown > a:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Efeito hover para o link principal */
+        }
+
+        .dropdown .dropdown-content {
+            display: none;
+            top: 100%;
+            position: absolute;
+            right: 0;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 1001;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+            width: 100%; /* Define a largura dos links */
+            box-sizing: border-box; /* Garante que o padding não afete a largura */
+            margin-top: 2px; /* Espaçamento entre o link e o dropdown */
+        }
+
+        .dropdown .dropdown-content a {
+            color: white;
+            padding: 10px 16px; /* Espaçamento interno nos links do dropdown */
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            margin-bottom: 5px; /* Adiciona espaçamento entre os links do dropdown */
+        }
+
+        .dropdown .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Efeito hover para os links do dropdown */
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown > a::after {
+            content: "▼";
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .dropdown:hover > a::after {
+            content: "▲";
+        }
+
+        .dropdown .dropdown-content a:last-child {
+            margin-bottom: 0;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 55px);
+            flex-direction: column;
+            text-align: center;
+            color: white;
+            margin-top: 35px; /* Ajuste este valor para mover o título para baixo */
+}
+
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 55px);
+            flex-direction: column;
+            text-align: center;
+            color: white;
+        }
+
+        .welcome-text {
+            font-size: 60px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: 'Georgia', serif;
+            text-shadow: 2px 2px 3px black;
+        }
+
+        .logo {
+            width: 300px;
+            height: auto;
+            margin-bottom: 20px; 
+        }
+
+        .category-description {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 80%; /* Ajuste a largura da caixa de categorias */
+            max-width: 800px; /* Limite máximo para a largura */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: left; /* Alinhar texto à esquerda */
+        }
+
+        .category-item {
+            margin-bottom: 20px; /* Espaçamento entre as categorias */
+        }
+
+        .category-description h2 {
+            margin: 0 0 10px; /* Margem entre o título e o texto */
+            text-align: center;
+        }
+
+        .category-description h3 {
+            margin: 0 0 5px; /* Margem entre o título e o texto */
+            font-size: 24px; /* Tamanho da fonte para o título */
+            text-align: center;
+        }
+
+        .category-description h4 {
+            margin: 0; /* Remove margens do texto descritivo */
+            font-size: 18px; /* Tamanho da fonte para a descrição */
+            line-height: 1.5; /* Melhora a legibilidade do texto */
+            text-align: center; /* Alinhamento centralizado para a descrição */
+        }
+
+        .category-description p {
+            margin: 10px 0; /* Margem entre os parágrafos */
+        }
+
+        .create-recipe-container {
+            margin-top: 20px; /* Espaçamento acima do botão */
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+                width: 100%;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 10px;
+            }
+        }
+
+        .footer {
+            margin-top: auto; /* Faz o rodapé ficar na parte inferior */
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    {% load static %}
+    <div class="header">
+        <div class="left">
+            <a href="{% url 'home' %}" style="color: white; text-decoration: none;">United For Food</a>
+        </div>
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                User Logged: {{ user.username }}
+                <button class="button" onclick="location.href='/logout/'">Logout</button>
+            {% else %}
+                <button class="button" onclick="location.href='/login/'">Login</button>
+                <button class="button" onclick="location.href='/register/'">Register</button>
+            {% endif %}
+        </div>
+    </div>
+    <div class="sidebar">
+        <a href="{% url 'posts' %}">Posts</a>
+        <a href="{% url 'about-us' %}">About Us</a>
+        <a href="{% url 'feedback' %}">Feedback</a>
+        
+        <!-- Dropdown Receipts -->
+        <div class="dropdown">
+            <a href="{% url 'receipts' %}">Receipts</a>
+            <div class="dropdown-content">
+                <a href="{% url 'recipe-list' category='Meat' %}">Meat Recipes</a>
+                <a href="{% url 'recipe-list' category='Fish' %}">Fish Recipes</a>
+                <a href="{% url 'recipe-list' category='Vegetarian' %}">Vegetarian Recipes</a>
+                <a href="{% url 'recipe-list' category='Healthy' %}">Healthy Recipes</a>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <h1 class="welcome-text">Receipts</h1>
+        <img src="{% static 'images/unitedfood.png' %}" alt="Logo" class="logo">
+
+        <div class="create-recipe-container">
+            <button class="button" onclick="location.href='/recipe_form/'">Create Recipe</button>
+        </div>
+
+        <div class="category-description">
+            <div class="category-item">
+                <h3><strong>Meat Recipes</strong></h3>
+                <h4>Discover a variety of delicious meat recipes that cater to all tastes, from hearty stews to grilled delights.</h4>
+            </div>
+            <div class="category-item">
+                <h3><strong>Fish Recipes</strong></h3>
+                <h4>Explore light and healthy fish recipes, just perfect for quick meals or special occasions.</h4>
+            </div>
+            <div class="category-item">
+                <h3><strong>Vegetarian Recipes</strong></h3>
+                <h4>Enjoy a range of plant-based dishes that are not only healthy but also packed with flavor.</h4>
+            </div>
+            <div class="category-item">
+                <h3><strong>Healthy Recipes</strong></h3>
+                <h4>Find nutritious recipes designed to help you maintain a balanced diet without sacrificing taste.</h4>
+            </div>
+        </div>
+        
+</body>
+</html>

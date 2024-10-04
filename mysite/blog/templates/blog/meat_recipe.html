@@ -1,0 +1,20 @@
+{% extends 'home.html' %}
+
+{% block content %}
+  <h2>Meat Recipes</h2>
+  <ul>
+    {% for recipe in recipes %}
+      <li>
+        <h3>{{ recipe.title }}</h3>
+        <p>Ingredients: {{ recipe.ingredients }}</p>
+        <p>Time: {{ recipe.time }} minutes</p>
+        {% if recipe.image %}
+          <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" width="200">
+        {% endif %}
+        <p>Created by: {{ recipe.created_by.username }} on {{ recipe.created_at }}</p>
+      </li>
+    {% empty %}
+      <p>No recipes found in this category.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

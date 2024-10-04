@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from .forms import PostForm, FeedbackForm
-from .models import Post, Comment
+from .forms import PostForm, FeedbackForm, RecipeForm
+from .models import Post, Comment, Recipe
 from django.views.generic import TemplateView
 
 def home(request):
@@ -13,7 +13,7 @@ def home(request):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()  # Use strip() para remover espaçospy
+        username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
 
@@ -100,7 +100,6 @@ def delete_post(request, post_id):
 
     return render(request, 'blog/delete_post.html', {'post': post})
 
-
 def posts(request):
     all_posts = Post.objects.all()
     return render(request, 'blog/posts.html', {'posts': all_posts})
@@ -154,3 +153,34 @@ def feedback_view(request):
         form = FeedbackForm()
     return render(request, 'blog/feedback.html', {'form': form})
 
+@login_required(login_url='login')
+def create_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES) 
+        if form.is_valid():
+            recipe = form.save(commit=False) 
+            recipe.created_by = request.user  # Define o usuário que criou a receita
+            recipe.save()  # Agora salva no banco de dados
+            return redirect('receipts')  # Redireciona para a página Receipts após a criação da receita
+    else:
+        form = RecipeForm()
+    
+    return render(request, 'recipe_form.html', {'form': form})
+
+@login_required(login_url='login')
+def recipe_list(request, category):
+    recipes = Recipe.objects.filter(category=category)
+
+    if category == 'Meat':
+        template_name = 'blog/meat_recipe.html'
+    elif category == 'Fish':
+        template_name = 'blog/fish_recipe.html'
+    elif category == 'Vegetarian':
+        template_name = 'blog/vegetarian_recipe.html'
+    elif category == 'Healthy':
+        template_name = 'blog/healthy_recipe.html'
+
+    return render(request, template_name, {'recipes': recipes, 'category': category})
+
+def receipts_view(request):
+    return render(request, 'blog/receipts.html')
