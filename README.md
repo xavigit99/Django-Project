@@ -8,7 +8,7 @@ Funcionalidades :
 
 -Um aplicativo, onde posso colocar posts de pratos de comida com imagens (slideshow para mais do que uma) - Onde podem adicionar o local e a localização do mesmo.
 
--É possivel fazer comentários no post e dar avaliação positiva ou negativa.
+-É possivel fazer comentários nos posts.
 
 -Possivel adicionar os posts aos favoritos
 
